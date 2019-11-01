@@ -13,6 +13,7 @@ public class HomeController : MonoBehaviour
     [SerializeField] CharacterSelectionHandler characterSelectionHandler;
     [SerializeField] HorizontalScrollSnap horizontalScrollSnap;
     [SerializeField] HomeProgressUI homeProgressUI;
+    [SerializeField] UI_InfiniteScroll infiniteScroll;
 
     [Header("Views")]
     [SerializeField]DetailsHomeUI UIDetails;
@@ -53,6 +54,7 @@ public class HomeController : MonoBehaviour
     void OnEnable()
     {
         characterSelectionHandler.OnSelectionChanged += CharacterSelectionHandler_OnSelectionChanged;
+        horizontalScrollSnap.OnSelectionChangeEndEvent.AddListener(OnSelectedPageEnd);
     }
 
     private void LocalizationManager_Event_LanguageChanged()
@@ -64,7 +66,7 @@ public class HomeController : MonoBehaviour
     void OnDisable()
     {
         characterSelectionHandler.OnSelectionChanged -= CharacterSelectionHandler_OnSelectionChanged;
-
+        horizontalScrollSnap.OnSelectionChangeEndEvent.RemoveListener(OnSelectedPageEnd);
     }
 
     /// <summary>
@@ -76,10 +78,10 @@ public class HomeController : MonoBehaviour
         currentCategory = selection.category;
         
         CleanCards();
-        SetCards();
+       
     }
 
-    async Task SetCards()
+    void SetCards()
     {
         homeProgressUI.txtCategory.text = currentCategory.ToString();
 
@@ -97,7 +99,7 @@ public class HomeController : MonoBehaviour
             case CharacterSelectionControl.Category.PROART:
                 imageBackground.color = colorsBackground[1];
                 homeProgressUI.txtCategory.font = tmp_Fonts[1];
-
+                InstantiatePainting();
                 break;
             default:
                 break;
@@ -106,13 +108,21 @@ public class HomeController : MonoBehaviour
     //removed card objets from UI
     void CleanCards()
     {
-        projectCards.Clear();
-        GameObject[] removed;
-        horizontalScrollSnap.RemoveAllChildren(out removed);
-        for (int i = 0; i < removed.Length; i++)
+        if (horizontalScrollSnap._screensContainer.childCount == 0)
         {
-            Destroy(removed[i]);
+            SetCards();
+            return;
         }
+
+        projectCards.Clear();
+        GameObject removed;
+      //  horizontalScrollSnap.RemoveAllChildren(out removed);
+        for (int i = 0; i < horizontalScrollSnap._screensContainer.childCount; i++)
+        {
+            horizontalScrollSnap.RemoveChild(i,out removed);
+        }
+
+        SetCards();
     }
 
     void InstantiatePainting()
@@ -122,11 +132,11 @@ public class HomeController : MonoBehaviour
             var card = Instantiate(prefabCardPaint);
             var script = card.GetComponent<CardUIControl>();
             script.button.onClick.AddListener(OnClick_Paint);
-
+            //projectCards.Add(i.ToString(),script);
             horizontalScrollSnap.AddChild(card);
         }
-        horizontalScrollSnap.ChangePage(0);
-
+        horizontalScrollSnap.UpdateLayout();
+        infiniteScroll.Init();
     }
     /// <summary>
     /// Instantiate cards by project list provided
@@ -140,6 +150,10 @@ public class HomeController : MonoBehaviour
     void OnClick_Paint()
     {
         Debug.Log("paint clicked");
+    }
+    void OnSelectedPageEnd(int page)
+    {
+        Debug.Log($"ended event selected page {page}");
     }
 
 }
