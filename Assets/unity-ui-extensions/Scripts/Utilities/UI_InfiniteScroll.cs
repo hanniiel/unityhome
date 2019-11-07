@@ -34,7 +34,7 @@ namespace UnityEngine.UI.Extensions
         private float _disableMarginX = 0;
         private float _disableMarginY = 0;
         private bool _hasDisabledGridComponents = false;
-        private List<RectTransform> items = new List<RectTransform>();
+        public List<RectTransform> items = new List<RectTransform>();
         private Vector2 _newAnchoredPosition = Vector2.zero;
         //TO DISABLE FLICKERING OBJECT WHEN SCROLL VIEW IS IDLE IN BETWEEN OBJECTS
         private float _treshold = 100f;
@@ -53,6 +53,7 @@ namespace UnityEngine.UI.Extensions
             if (GetComponent<ScrollRect>() != null)
             {
                 _scrollRect = GetComponent<ScrollRect>();
+                _scrollRect.onValueChanged.RemoveAllListeners();
                 _scrollRect.onValueChanged.AddListener(OnScroll);
                 _scrollRect.movementType = ScrollRect.MovementType.Unrestricted;
 

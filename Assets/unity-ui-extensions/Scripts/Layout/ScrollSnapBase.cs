@@ -103,9 +103,14 @@ namespace UnityEngine.UI.Extensions
                     {
                         _infiniteWindow = (int)(Math.Floor(infWindow));
                     }
+                    else if (!float.IsNaN(infWindow) && _screensContainer.childCount>0)
+                    {
+                        
+                        _infiniteWindow = value / _screensContainer.childCount;
+                    }
                     else
                     {
-                        _infiniteWindow = value / _screensContainer.childCount;
+                        return;
                     }
                     //Invert the value if negative and differentiate from Window 0
                     _infiniteWindow = value < 0 ? (-_infiniteWindow) : _infiniteWindow;

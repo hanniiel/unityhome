@@ -5,7 +5,7 @@ using UnityEngine.UI.Extensions;
 using UnityEngine.UI;
 using TMPro;
 using System.Threading.Tasks;
-
+using DG.Tweening;
 public class HomeController : MonoBehaviour
 {
     public GameObject prefabCardProart,prefabCardPaint;
@@ -14,6 +14,9 @@ public class HomeController : MonoBehaviour
     [SerializeField] HorizontalScrollSnap horizontalScrollSnap;
     [SerializeField] HomeProgressUI homeProgressUI;
     [SerializeField] UI_InfiniteScroll infiniteScroll;
+    [SerializeField] TextMeshProUGUI txtSelection;
+    [SerializeField] StyleUI[] styles;
+    [SerializeField] Image bar;
 
     [Header("Views")]
     [SerializeField]DetailsHomeUI UIDetails;
@@ -75,12 +78,20 @@ public class HomeController : MonoBehaviour
     /// <param name="selection"></param>
     private void CharacterSelectionHandler_OnSelectionChanged(CharacterSelectionControl selection)
     {
+        Debug.Log(" cay changed");
+
         currentCategory = selection.category;
-        
+        txtSelection.text = selection.category.ToString();
+        txtSelection.transform.DOMoveX(selection.transform.position.x, 0.2f);
         CleanCards();
        
     }
+    void SetStyle()
+    {
 
+    }
+
+    public UnityEngine.Gradient currentGradient;
     void SetCards()
     {
         homeProgressUI.txtCategory.text = currentCategory.ToString();
@@ -89,16 +100,32 @@ public class HomeController : MonoBehaviour
         {
 
             case CharacterSelectionControl.Category.PAINTING:
-                imageBackground.color = colorsBackground[1];
-                homeProgressUI.txtCategory.font = tmp_Fonts[0];
+                imageBackground.color = styles[0].backgroundColor;
+                txtSelection.outlineColor = styles[0].fontshadow;
+                txtSelection.color = styles[0].font;
+                bar.color = styles[0].primary;
+                currentGradient = styles[0].cardGradient;
+
+                //homeProgressUI.txtCategory.font = tmp_Fonts[0];
                 InstantiatePainting();
                 break;
             case CharacterSelectionControl.Category.DESIGN:
-                
+                imageBackground.color = styles[1].backgroundColor;
+                txtSelection.outlineColor = styles[1].fontshadow;
+                txtSelection.color = styles[1].font;
+                bar.color = styles[1].primary;
+                currentGradient = styles[1].cardGradient;
+                //homeProgressUI.txtCategory.font = tmp_Fonts[0];
+                InstantiatePainting();
                 break;
             case CharacterSelectionControl.Category.PROART:
-                imageBackground.color = colorsBackground[1];
-                homeProgressUI.txtCategory.font = tmp_Fonts[1];
+                imageBackground.color = styles[2].backgroundColor;
+                txtSelection.outlineColor = styles[2].fontshadow;
+                txtSelection.color = styles[2].font;
+                bar.color = styles[2].primary;
+                currentGradient = styles[2].cardGradient;
+
+                // homeProgressUI.txtCategory.font = tmp_Fonts[1];
                 InstantiatePainting();
                 break;
             default:
@@ -110,21 +137,21 @@ public class HomeController : MonoBehaviour
     {
         if (horizontalScrollSnap._screensContainer.childCount == 0)
         {
+            Debug.Log("clear 1st ");
+
             SetCards();
             return;
         }
 
         projectCards.Clear();
-        GameObject removed;
-      //  horizontalScrollSnap.RemoveAllChildren(out removed);
-        for (int i = 0; i < horizontalScrollSnap._screensContainer.childCount; i++)
-        {
-            horizontalScrollSnap.RemoveChild(i,out removed);
-        }
+        GameObject[] removed;
+        horizontalScrollSnap.RemoveAllChildren(out removed);
+        infiniteScroll.items.Clear();
+        horizontalScrollSnap._currentPage = 0;
 
         SetCards();
     }
-
+  
     void InstantiatePainting()
     {
         for (int i = 0; i < 5; i++)
@@ -132,11 +159,13 @@ public class HomeController : MonoBehaviour
             var card = Instantiate(prefabCardPaint);
             var script = card.GetComponent<CardUIControl>();
             script.button.onClick.AddListener(OnClick_Paint);
-            //projectCards.Add(i.ToString(),script);
+            script.gradient.EffectGradient.SetKeys(currentGradient.colorKeys , currentGradient.alphaKeys);
+            projectCards[i.ToString()] = script;
             horizontalScrollSnap.AddChild(card);
         }
-        horizontalScrollSnap.UpdateLayout();
+
         infiniteScroll.Init();
+        
     }
     /// <summary>
     /// Instantiate cards by project list provided
@@ -151,9 +180,16 @@ public class HomeController : MonoBehaviour
     {
         Debug.Log("paint clicked");
     }
+    CardUIControl currentCard;
     void OnSelectedPageEnd(int page)
     {
         Debug.Log($"ended event selected page {page}");
+        if (currentCard != null)
+        {
+            currentCard.transform.DOScale(Vector2.one,0.2f);
+        }
+        currentCard = projectCards[page.ToString()];
+        currentCard.transform.DOScale(new Vector2(1.2f,1.2f), .2f);
     }
 
 }

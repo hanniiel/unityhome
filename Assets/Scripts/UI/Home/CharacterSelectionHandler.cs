@@ -13,22 +13,26 @@ public class CharacterSelectionHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        bool isFisrt = true;
         for (int i = 0; i < transform.childCount; i++)
         {
-           var toggle = transform.GetChild(i).GetComponent<Toggle>();
-           var categoryScript = transform.GetChild(i).GetComponent<CharacterSelectionControl>();
-
-            //subscribe from toggle
-            toggle.onValueChanged.AddListener((isOn) =>
+           var toggle = transform.GetChild(i)?.GetComponent<Toggle>();
+            if (toggle != null)
             {
-                if (isOn)
-                {
-                    OnSelectionChanged?.Invoke(categoryScript);
-                }
-            });
-            //set default category
-            toggle.isOn = (i == 0);
+                var categoryScript = transform.GetChild(i).GetComponent<CharacterSelectionControl>();
 
+                //subscribe from toggle
+                toggle.onValueChanged.AddListener((isOn) =>
+                {
+                    if (isOn)
+                    {
+                        OnSelectionChanged?.Invoke(categoryScript);
+                    }
+                });
+                //set default category
+                toggle.isOn = isFisrt;
+                isFisrt = false;
+            }
         }
     }
 
