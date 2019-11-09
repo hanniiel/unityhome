@@ -35,11 +35,15 @@ public class HomeController : MonoBehaviour
     //data
     CharacterSelectionControl.Category currentCategory;
     Dictionary<string, CardUIControl> projectCards = new Dictionary<string, CardUIControl>();
+
+    //current style
+    StyleUI currentStyle;
+    
     private void Start()
     {
        
         //start button from details
-        UIDetails.buttonStart.onClick.AddListener(() =>
+        UIDetails.buttonStart?.onClick.AddListener(() =>
         {
             if(currentCategory== CharacterSelectionControl.Category.PROART)
             {
@@ -88,7 +92,11 @@ public class HomeController : MonoBehaviour
     }
     void SetStyle()
     {
-
+        imageBackground.color = currentStyle.backgroundColor;
+        txtSelection.outlineColor = currentStyle.fontshadow;
+        txtSelection.color = currentStyle.font;
+        bar.color = currentStyle.primary;
+        currentGradient = currentStyle.cardGradient;
     }
 
     public UnityEngine.Gradient currentGradient;
@@ -100,33 +108,22 @@ public class HomeController : MonoBehaviour
         {
 
             case CharacterSelectionControl.Category.PAINTING:
-                imageBackground.color = styles[0].backgroundColor;
-                txtSelection.outlineColor = styles[0].fontshadow;
-                txtSelection.color = styles[0].font;
-                bar.color = styles[0].primary;
-                currentGradient = styles[0].cardGradient;
-
-                //homeProgressUI.txtCategory.font = tmp_Fonts[0];
-                InstantiatePainting();
+                currentStyle = styles[0];
+                SetStyle();
+                InstantiatePainting(prefabCardPaint);
                 break;
             case CharacterSelectionControl.Category.DESIGN:
-                imageBackground.color = styles[1].backgroundColor;
-                txtSelection.outlineColor = styles[1].fontshadow;
-                txtSelection.color = styles[1].font;
-                bar.color = styles[1].primary;
-                currentGradient = styles[1].cardGradient;
+                currentStyle = styles[1];
+                SetStyle();
                 //homeProgressUI.txtCategory.font = tmp_Fonts[0];
-                InstantiatePainting();
+                InstantiatePainting(prefabCardPaint);
                 break;
             case CharacterSelectionControl.Category.PROART:
-                imageBackground.color = styles[2].backgroundColor;
-                txtSelection.outlineColor = styles[2].fontshadow;
-                txtSelection.color = styles[2].font;
-                bar.color = styles[2].primary;
-                currentGradient = styles[2].cardGradient;
+                currentStyle = styles[2];
+                SetStyle();
 
                 // homeProgressUI.txtCategory.font = tmp_Fonts[1];
-                InstantiatePainting();
+                InstantiatePainting(prefabCardProart);
                 break;
             default:
                 break;
@@ -152,11 +149,11 @@ public class HomeController : MonoBehaviour
         SetCards();
     }
   
-    void InstantiatePainting()
+    void InstantiatePainting(GameObject prefabCard)
     {
         for (int i = 0; i < 5; i++)
         {
-            var card = Instantiate(prefabCardPaint);
+            var card = Instantiate(prefabCard);
             var script = card.GetComponent<CardUIControl>();
             script.button.onClick.AddListener(OnClick_Paint);
             script.gradient.EffectGradient.SetKeys(currentGradient.colorKeys , currentGradient.alphaKeys);
@@ -179,6 +176,8 @@ public class HomeController : MonoBehaviour
     void OnClick_Paint()
     {
         Debug.Log("paint clicked");
+        UIDetails.SetStyle(currentStyle);
+        UIDetails.Show();
     }
     CardUIControl currentCard;
     void OnSelectedPageEnd(int page)
@@ -186,10 +185,10 @@ public class HomeController : MonoBehaviour
         Debug.Log($"ended event selected page {page}");
         if (currentCard != null)
         {
-            currentCard.transform.DOScale(Vector2.one,0.2f);
+            currentCard.transform.GetChild(0).DOScale(Vector2.one,0.2f);
         }
         currentCard = projectCards[page.ToString()];
-        currentCard.transform.DOScale(new Vector2(1.2f,1.2f), .2f);
+        currentCard.transform.GetChild(0).DOScale(new Vector2(1.2f,1.2f), 0.2f);
     }
 
 }

@@ -18,17 +18,21 @@ public class DetailsHomeUI : UIBase
     void Start()
     {
         buttonClose.onClick.AddListener(tweenAnimation.DOPlayBackwards);
+        tweenAnimation.onComplete.AddListener(() => {
+            
+        });
+        tweenAnimation.onRewind.AddListener(Disable);
     }
 
-    public void SetColors(Color colorFont, UnityEngine.Gradient gradientColor, Image imageCover = null)
+    public void SetStyle(StyleUI style)
     {
-        title.color = colorFont;
-        description.color = colorFont;
-        gradientBackground.EffectGradient = gradientColor;
+        title.color = style.font;
+        title.outlineColor = style.fontshadow;
+        gradientBackground.EffectGradient.SetKeys(style.cardGradient.colorKeys, style.cardGradient.alphaKeys);
     }
     public async void SetData()
     {
-        
+       
     }
 
     public override void Hide()

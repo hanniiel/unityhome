@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
-  m_Name: LuckiestGuy-Regular SDF
+  m_Name: LuckiestGuy-Regular SDF 1
   m_EditorClassIdentifier: 
-  hashCode: -1536617929
+  hashCode: 1660321830
   material: {fileID: 21619376341884362}
   materialHashCode: 1988142556
   m_Version: 1.1.0
@@ -2469,7 +2469,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: LuckiestGuy-Regular SDF Material
   m_Shader: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
-  m_ShaderKeywords: UNDERLAY_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
